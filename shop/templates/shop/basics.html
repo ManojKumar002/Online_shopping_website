@@ -11,12 +11,13 @@
         integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
     <title>{% block title %} {% endblock %}</title>
-    <style>{% block css1 %} {% endblock %}</style>
+    {% block css1 %}{% endblock %}
+    </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">My Awesome Cart</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="/shop">My Awesome Cart</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -25,38 +26,36 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/shop">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
+                    <a class="nav-link" href="/shop/about">About</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Cart(<span id="cartValue">0</span>)</a>
+                    <a class="nav-link" href="/shop/tracker">Tracker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop/contact">Contact Us</a>
                 </li>
             </ul>
+
             <form class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
+
+            <form action="/shop/tracker">
+            <button id="popcart" type="submit" class="btn btn-primary mx-2">Cart
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <span id="cartValue">0</span>
+                </span>
+            </button>
+        </form>
         </div>
     </nav>
 
     {% block body %} {% endblock %}
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -66,7 +65,92 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
         integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
         crossorigin="anonymous"></script>
+
+
+    <script>
+        //return the sum of number of products added to the cart
+        function productSum() {
+            let sum = 0;
+            a = Object.values(JSON.parse(localStorage.getItem('cart')));
+            a.forEach(element => {
+                sum += Number(element);
+            });
+            return sum;
+        }
+
+        //update the localStorage and cart item count
+        function refresh() {
+            localStorage.setItem('cart', JSON.stringify(cartArr));
+            document.getElementById('cartValue').innerHTML = productSum();
+        }
+
+        //function for add button
+        function addProd() {
+            let addProduct = document.querySelectorAll('.cartAdd');
+            addProduct.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    let productid = e.target.getAttribute('id');
+                    productid=productid.slice(3);
+                    cartArr[productid] += 1;
+                    e.target.previousSibling.innerHTML = cartArr[productid];
+                    refresh();
+                });
+            });
+        }
+
+        //function for substraction button
+        function subProd() {
+            let subProduct = document.querySelectorAll('.cartSub');
+            subProduct.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    let productid = e.target.getAttribute('id');
+                    if (cartArr[productid] == 1) {
+                        a = document.getElementById(productid).parentElement;
+                        a.innerHTML = `<a href="#" id="` + productid + `" class="btn btn-primary cart">Add to cart</a>`;
+                        delete cartArr[productid];
+                        refresh();
+                        addToCart();
+                    }
+                    else {
+                        cartArr[productid] -= 1;
+                        e.target.nextSibling.innerHTML = cartArr[productid];
+                        refresh();
+                    }
+
+                });
+            });
+        }
+
+
+        //fires when clicked on Add to cart
+        function addToCart() {
+            var cartClass = document.querySelectorAll(".cart");
+            cartClass.forEach((ele) => {
+                ele.addEventListener('click', (e) => {
+                    let cartId = (e.target.getAttribute('id'));
+                    cartArr[cartId] = 1;
+                    refresh();
+                    updateButton();
+                    addProd();
+                    subProd();
+                });
+            });
+        }
+
+        addToCart();
+        if (localStorage.getItem('cart') == null) {//cartArr=[] is not accepted by JSON.Stringify()
+            var cartArr = {};
+        }
+        else {
+            var cartArr = JSON.parse(localStorage.getItem('cart'));
+            document.getElementById('cartValue').innerHTML = productSum();
+        }
+
+    </script>
+
+
     {% block js %} {% endblock %}
+
 </body>
 
 </html>
