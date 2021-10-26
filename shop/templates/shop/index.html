@@ -69,8 +69,8 @@
                         <div class="card align-items-center" style="width: 18rem;">
                             <img src='/media/{{i.image}}' class="card-img-top mt-2" alt="...">
                             <div class="card-body">
-                                <h5 class="card-title">{{i.product_name}}</h5>
-                                <p class="card-text">{{i.category}}</p>
+                                <h5 id="productName{{i.id}}" class="card-title">{{i.product_name}}</h5>
+                                <p id="productPrice{{i.id}}" class="card-text">₹ {{i.price}}</p>
                                 <span id='button{{i.id}}'>
                                     <a href="#" id='product{{i.id}}' class="btn btn-primary cart">Add to cart</a>
                                 </span>
@@ -106,11 +106,15 @@
         function updateButton() {
             let cartArr1 = Object.keys(JSON.parse(localStorage.getItem('cart')));
             cartArr1.forEach((element) => {
-                console.log('inside');
-                document.getElementById(element).parentElement.innerHTML = `<a href="#" id="product` + element.slice(7) +
-                    `" class="btn btn-primary mr-2 cartSub">-</a>` +  `<span>` + cartArr[element] +`</span>`+
+                try{
+                    document.getElementById(element).parentElement.innerHTML = `<a href="#" id="product` + element.slice(7) +
+                    `" class="btn btn-primary mr-2 cartSub">-</a>` +  `<span>` + cartArr[element][0] +`</span>`+
                     `<a href="#" id="addproduct` + element.slice(7) + `" class="btn btn-primary ml-2 cartAdd">+</a>`;
+                }
+                catch(e){}
+                
             });
+            
         }
 
         //if products exists in the cart already will update the buttons first then addprod and subprod
