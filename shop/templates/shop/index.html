@@ -98,16 +98,17 @@
     <!-- #extracting the cart data obtained from django -->
     {% if user.is_authenticated %}
 
-    <input type="hidden" value={{cart.json_data}} id="cart_data">
-    <input type="hidden" value={{cart_length}} id="cart_length">
-    
+    <!-- cant use type="hidden" for textarea -->
+    <textarea id="cart_data" style="display: none;">{{cart.json_data}}</textarea>?
+    <input id="cart_length" type="hidden" value={{cart_length}}>
+
     {% else %}
-    
+
     <input type="hidden" value="" id="cart_data">
     <input type="hidden" value=0 id="cart_length">
-    
+
     {% endif %}
-    
+
 </div>
 {% endblock %}
 
@@ -128,18 +129,21 @@
 
     }
 
-    var cart_data=document.getElementById('cart_data').value;
-    var cart_length=document.getElementById('cart_length').value;
+    var cart_data = document.getElementById('cart_data').value;
+    var cart_length = document.getElementById('cart_length').value;
     console.log(cart_data)
     console.log(cart_length)
 
-    if(cart_data=="" || cart_length==0){
-        var cartArr={}
+    if (cart_data == "" || cart_data == 0 || cart_length == 0) {
+        var cartArr = {}
     }
-    else{
-        var cartArr=JSON.parse(cart_data);
-        refresh();
+    else {
+        var cartArr = JSON.parse(cart_data);
     }
+    refresh();
+    updateButton();
+    addProd();
+    subProd();
 
 </script>
 
