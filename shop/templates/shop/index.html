@@ -51,12 +51,6 @@
     <h3 class="my-3">Recomonded Products in {{products.0.category}}</h3>
     <div class="row">
         <div id="demo{{forloop.counter}}" class="col carousel slide my-3" data-ride="carousel">
-            <ul class="carousel-indicators">
-                <li data-target="#demo{{forloop.counter}}" data-slide-to="0" class="active"></li>
-                {% for i in range %}
-                <li data-target="#demo{{forloop.parentloop.counter}}" data-slide-to="{{i}}"></li>
-                {% endfor %}
-            </ul>
 
 
             <!--Slideshow starts here -->
@@ -72,14 +66,14 @@
                                 <h5 id="productName{{i.id}}" class="card-title">{{i.product_name}}</h5>
                                 <p id="productPrice{{i.id}}" class="card-text">₹ {{i.price}}</p>
                                 <span id='button{{i.id}}'>
-                                    <a href="#" id='product{{i.id}}' class="btn btn-primary cart">Add to cart</a>
+                                    <div id='product{{i.id}}' class="btn btn-primary cart">Add to cart</div>
                                 </span>
                                 <a href="/shop/productView/{{i.id}}" id="quickView{{i.id}}"
                                     class="btn btn-primary ml-3">Quick view</a>
                             </div>
                         </div>
                     </div>
-                    {% if forloop.counter|divisibleby:3 and forloop.counter > 0 and not forloop.last %}
+                    {% if forloop.counter|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
                 </div>
                 <div class="carousel-item">
                     {% endif %}
@@ -91,38 +85,62 @@
 
         <!-- left and right controls for the slide -->
         <a class="carousel-control-prev" href="#demo{{forloop.counter}}" data-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
+            <img
+                src="https://img.icons8.com/external-those-icons-fill-those-icons/24/000000/external-left-arrows-those-icons-fill-those-icons-3.png" />
         </a>
         <a class="carousel-control-next" href="#demo{{forloop.counter}}" data-slide="next">
-            <span class="carousel-control-next-icon"></span>
+            <img src="https://img.icons8.com/external-those-icons-fill-those-icons/24/000000/
+            external-right-arrows-those-icons-fill-those-icons-5.png" />
         </a>
     </div>
     {% endfor %}
-    {% endblock %}
 
-    {% block js %}
-    <script>
-        //updates the button if item is there in cart
-        function updateButton() {
-            let cartArr1 = Object.keys(JSON.parse(localStorage.getItem('cart')));
-            cartArr1.forEach((element) => {
-                try{
-                    document.getElementById(element).parentElement.innerHTML = `<a href="#" id="product` + element.slice(7) +
-                    `" class="btn btn-primary mr-2 cartSub">-</a>` +  `<span>` + cartArr[element][0] +`</span>`+
-                    `<a href="#" id="addproduct` + element.slice(7) + `" class="btn btn-primary ml-2 cartAdd">+</a>`;
-                }
-                catch(e){}
-                
-            });
-            
-        }
+    <!-- #extracting the cart data obtained from django -->
+    {% if user.is_authenticated %}
 
-        //if products exists in the cart already will update the buttons first then addprod and subprod
-        if(localStorage.getItem('cart') != null){
-            updateButton();
-            addProd();
-            subProd();
-        }
-    </script>
+    <input type="hidden" value={{cart.json_data}} id="cart_data">
+    <input type="hidden" value={{cart_length}} id="cart_length">
+    
+    {% else %}
+    
+    <input type="hidden" value="" id="cart_data">
+    <input type="hidden" value=0 id="cart_length">
+    
+    {% endif %}
+    
+</div>
+{% endblock %}
 
-    {% endblock %}
+{% block js %}
+<script>
+    //updates the button if item is there in cart
+    function updateButton() {
+        let cartArr1 = Object.keys(JSON.parse(localStorage.getItem('cart')));
+        cartArr1.forEach((element) => {
+            try {
+                document.getElementById(element).parentElement.innerHTML = `<div id="product` + element.slice(7) +
+                    `" class="btn btn-primary mr-2 cartSub">-</div>` + `<span>` + cartArr[element][0] + `</span>` +
+                    `<div id="addproduct` + element.slice(7) + `" class="btn btn-primary ml-2 cartAdd">+</div>`;
+            }
+            catch (e) { }
+
+        });
+
+    }
+
+    var cart_data=document.getElementById('cart_data').value;
+    var cart_length=document.getElementById('cart_length').value;
+    console.log(cart_data)
+    console.log(cart_length)
+
+    if(cart_data=="" || cart_length==0){
+        var cartArr={}
+    }
+    else{
+        var cartArr=JSON.parse(cart_data);
+        refresh();
+    }
+
+</script>
+
+{% endblock %}

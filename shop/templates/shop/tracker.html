@@ -1,0 +1,19 @@
+{% extends 'shop/basics.html' %}
+{% block title%} My Awesome Cart Tracker{% endblock %}
+{% block body %}
+<div class="container">
+    <div id="cartContainer" style="margin-top: 20px;">
+        <div class="container" style="border-collapse: collapse;">
+            <div class="row align-items-center border border-primary" style="height: 50px;border-width:2px !important">
+                <div class="col-4"></div>
+                <div class="col-4">
+                    <h5>Cart is Empty</h5>
+                </div>
+                <div class="col-4">
+                    <div class="badge bg-warning" style="float:right"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
