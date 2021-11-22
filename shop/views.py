@@ -41,21 +41,32 @@ def load_cart(request,params):
     return params
 
 
+def keymatch(item,key):
+    if key in item.product_name.lower() or key in item.category.lower() or key in item.subcategory.lower() or key in item.desc.lower():
+        return True
+    else:
+        return False
+
+
 def index(request):
     params=loadAllProducts()
     params=load_cart(request,params)
     return render(request, "shop/index.html", params)
 
 def about(request):
-    return render(request, "shop/about.html")
+    params={}
+    params=load_cart(request,params)
+    return render(request, "shop/about.html",params)
 
 
 def tracker(request):
-    return render(request, "shop/tracker.html")
+    params={}
+    params=load_cart(request,params)
+    return render(request, "shop/tracker.html",params)
 
 
 def checkout(request):
-    success1 = {'success': False}
+    params = {'success': False}
     if(request.method == "POST"):
         name = request.POST.get('name') #instead can use request.POST['name'] 
         email = request.POST.get('email')
@@ -71,8 +82,9 @@ def checkout(request):
         orderTracker = Tracker(order_id=checkout.order_id,
                                desc="Order has been placed")
         orderTracker.save()
-        success1 = {'success': True}
-    return render(request, "shop/checkout.html", success1)
+        params = {'success': True}
+    params=load_cart(request,params)
+    return render(request, "shop/checkout.html", params)
 
 
 def contact(request):
@@ -84,12 +96,16 @@ def contact(request):
         contact = Contact(name=name, email=email,
                           phoneNumber=phoneNumber, desc=desc)
         contact.save()
-    return render(request, "shop/contact.html")
+    params={}
+    params=load_cart(request,params)
+    return render(request, "shop/contact.html",params)
 
 
 def productView(request, myid):
     displayproducts = Product.objects.filter(id=myid)#gets the list of products as query sets 
     params = {'product': displayproducts[0]}
+
+
     #post request is for adding the comments to database
     if request.method=="POST" :
         comment=request.POST['comment']#here comment is used to catch both comments and replays and its differentiated with the help of parentId
@@ -105,6 +121,8 @@ def productView(request, myid):
                 parent=productComments.objects.get(comment_id=parentid)
                 pcomments=productComments(comment=comment,product=product,user=user,parent=parent)
             pcomments.save()
+        else:
+            messages.warning('Please enter valid comment')
     #extracting the comment and replies from the database and differentiating it
     comments=productComments.objects.filter(product=displayproducts[0],parent=None)
     replies=productComments.objects.filter().exclude(parent=None)
@@ -118,33 +136,35 @@ def productView(request, myid):
 
     params['comments']=comments
     params['repliesDict']=repliesDict
+    params=load_cart(request,params)
     return render(request, "shop/productView.html", params)
 
-def keymatch(item,key):
-    if key.lower() in item.product_name.lower() or key in item.category.lower() or key in item.subcategory.lower() or key in item.desc.lower():
-        return True
-    else:
-        False
 
 def search(request):
     key=request.POST.get('search')
-    if(key==None):
+    if(key==None or key.split()==[]):
         params=loadAllProducts()
+        messages.error(request,'Please enter valid keywords')
     else:
         allProds = []
         catprods = Product.objects.values('category')
+        # aggregating the category of the products
         cats = {item['category'] for item in catprods}
         for cat in cats:
             prodtemp = Product.objects.filter(category=cat)
-            prod=[item for item in prodtemp if keymatch(item,key)]
+            prod=[item for item in prodtemp if keymatch(item,key.lower())]
             n = len(prod)
-            if(n==0):
-                messages.error(request,'No match found, Please try different keyword')
-                params=loadAllProducts()
-                return render(request, "shop/index.html", params)
-            nSlides = n//4 + ceil((n/4)-(n//4))
-            allProds.append([prod, range(1, nSlides), nSlides])
+            if(n!=0):
+                nSlides = n//4 + ceil((n/4)-(n//4))
+                allProds.append([prod, range(1, nSlides), nSlides])
+
+        if(len(allProds)==0):
+            messages.error(request,'No match found, Please try different keyword')
+            params=loadAllProducts()
+            params=load_cart(request,params)
+            return render(request, "shop/index.html", params)
         params = {'allProds': allProds}
+    params=load_cart(request,params)
     return render(request, "shop/index.html", params)
 
 

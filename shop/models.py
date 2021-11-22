@@ -53,7 +53,7 @@ class Tracker(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return self.tracker_id
+        return self.desc[:15]+'...'
 
 class productComments(models.Model):
     comment_id=models.AutoField(primary_key=True)
