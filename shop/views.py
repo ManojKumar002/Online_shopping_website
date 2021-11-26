@@ -1,10 +1,15 @@
 from django.db.models.fields import CommaSeparatedIntegerField
+from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate,logout,login
 from django.contrib.auth.models import User
 from django.shortcuts import render,redirect
 from django.http.response import HttpResponse
 from django.contrib import messages
 from math import ceil
+import io
+import json
 
 
 from E_Commerce.settings import MEDIA_ROOT
@@ -53,14 +58,15 @@ def index(request):
     params=load_cart(request,params)
     return render(request, "shop/index.html", params)
 
-def about(request):
-    params={}
-    params=load_cart(request,params)
-    return render(request, "shop/about.html",params)
-
 
 def tracker(request):
     params={}
+    orders_list=[]
+    checkout=Checkout.objects.all()
+    for order in checkout:
+        track=Tracker.objects.filter(order_id=order.order_id).order_by('date')
+        orders_list.append([order,track])
+    params['orders_list']=orders_list
     params=load_cart(request,params)
     return render(request, "shop/tracker.html",params)
 
@@ -222,16 +228,25 @@ def userLogin(request):
 def userLogout(request):
     if request.method=="POST":
         currentPath=request.POST['currentPath']
-        json_cart_data=request.POST['json_cart_data']
-        try:
-            #fetching the existing users details in the cart record , else create it
-            cart_object=Cartrecord.objects.get(cart_user=request.user)
-            cart_object.json_data=json_cart_data
-            cart_object.save()
-        except:
-            cart_object=Cartrecord(cart_user=request.user,json_data=json_cart_data)
-            cart_object.save()
-            print('inside except')
     logout(request)
     messages.info(request, 'Successfully Logged out')
     return redirect(currentPath)
+
+
+#updates the cart asynchronously
+@csrf_exempt
+def updateCart(request):
+    if request.method=="POST":
+        if request.user.is_authenticated:
+            json_cart_data=request.body
+            stream=io.BytesIO(json_cart_data)
+            json_cart_object=JSONParser().parse(stream)
+            json_cart_string=json.dumps(json_cart_object)
+            try:
+                cart_object=Cartrecord.objects.get(cart_user=request.user)
+                cart_object.json_data=json_cart_string
+                cart_object.save()
+            except:
+                cart_object=Cartrecord(cart_user=request.user)
+                cart_object.save()
+    return HttpResponse("successfully updated")

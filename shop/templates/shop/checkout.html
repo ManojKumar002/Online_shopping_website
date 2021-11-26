@@ -13,7 +13,7 @@
         <h5>Price X Count </h5>
       </div>
       <div class="col-4">
-        <div class="badge bg-warning" style="float:right;font-size: medium;width: 110px;">Total Price</div>
+        <div class="badge bg-warning" style="float:right;font-size: medium;width: 110px;color: black;">Total Price</div>
       </div>
     </div>
   </div>
@@ -102,7 +102,7 @@
         <p>`+ cartArr[element][2] + ` X ` + cartArr[element][0] + `</p>
       </div>
       <div class="col-4">
-        <div class="badge bg-warning" style="float:right;width: 110px;"><h6>`+ cartArr[element][2] * cartArr[element][0] + `</h6></div>
+        <div class="badge bg-warning" style="float:right;width: 110px;color:black;"><h6>`+ cartArr[element][2] * cartArr[element][0] + `</h6></div>
       </div>
     </div>
   </div> `;
@@ -111,11 +111,11 @@
     if (tempArr != "") {
       tempArr += `
   <div class="container mt-4">
-    <div class="row align-items-center border border-primary" style="height: 50px;border-width:2px !important">
+    <div class="row align-items-center border border-primary" style="height: 60px;border-width:2px !important">
       <div class="col-4"><h5>Grand Sum</h5></div>
       <div class="col-4"></div>
       <div class="col-4">
-        <div class="badge bg-warning" style="float:right;width: 110px;"><h5>`+ priceSum + `</h5></div>
+        <div class="badge bg-warning" style="float:right;width: 110px;color:black;"><h5>`+ priceSum + `</h5></div>
       </div>
     </div>
   </div> `

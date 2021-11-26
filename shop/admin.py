@@ -9,9 +9,15 @@ class ProductAdmin(admin.ModelAdmin):
 class CartdataAdmin(admin.ModelAdmin):
     list_display=['cart_user']
 
+class CheckoutAdmin(admin.ModelAdmin):
+    list_display=['order_id','name']
+
+class TrackerAdmin(admin.ModelAdmin):
+    list_display=['tracker_id','order_id','desc','date']
+
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Contact)
-admin.site.register(Checkout)
-admin.site.register(Tracker)
+admin.site.register(Checkout,CheckoutAdmin)
+admin.site.register(Tracker,TrackerAdmin)
 admin.site.register(productComments)
 admin.site.register(Cartrecord,CartdataAdmin)

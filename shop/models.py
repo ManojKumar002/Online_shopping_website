@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from django.conf import settings
 
+
 class Product(models.Model):
     product_id = models.AutoField
     product_name = models.CharField(max_length=20, default="")
@@ -49,11 +50,9 @@ class Checkout(models.Model):
 class Tracker(models.Model):
     tracker_id=models.AutoField(primary_key=True)
     order_id=models.IntegerField(default="")
-    desc = models.CharField(max_length=300, default="")
-    date = models.DateField(auto_now_add=True)
+    desc = models.CharField(max_length=300, default="Order has been placed")
+    date = models.DateTimeField(default=now)
 
-    def __str__(self):
-        return self.desc[:15]+'...'
 
 class productComments(models.Model):
     comment_id=models.AutoField(primary_key=True)

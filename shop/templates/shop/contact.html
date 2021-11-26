@@ -4,7 +4,7 @@
 
 {% block body %}
 
-<div id="formContainer" class="mt-5 mx-auto" style="width: 50vw;">
+<div id="formContainer" class="mt-5 mx-auto">
     <form action="/shop/contact/" method="post">{% csrf_token %}
         <div class="mb-3">
             <label for="name" class="form-label"></label>
@@ -26,5 +26,17 @@
     </form>
 </div>
 
+{% block css1 %}
+<style>
+    #formContainer{
+        width: 50vw;
+    }
+    @media (max-width:800px){
+        #formContainer{
+            width: 80vw;
+        }
+    }
+</style>
 
+{% endblock %}
 {% endblock %}
