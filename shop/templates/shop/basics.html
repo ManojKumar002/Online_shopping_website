@@ -30,7 +30,7 @@
 
 
     <title>{% block title %} {% endblock %}</title>
-    {% block css1 %}{% endblock %}
+    {% block css1 %} {% endblock %}
 </head>
 
 <body>
@@ -40,10 +40,21 @@
         nonce="xuiu1WLy"></script>
 
     <!-- nav bar starts here-->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <a class="navbar-brand" href="/shop">Quick Cart</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="padding: 3px;">
+        <!-- #logo and brand Name -->
+        <div style="display: flex;">
+            <a href="/shop/" style="display: flex;">
+                <img src="https://img.icons8.com/nolan/64/fast-cart.png" />
+                <span class="navbar-brand mt-2" 
+                style="margin-right:0px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, serif;
+                font-size: x-large;"><strong>Quick Cart</strong>
+                </span>
+            </a>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </div>
+
+
+        <div class="collapse navbar-collapse ml-3" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="/shop">Home <span class="sr-only">(current)</span></a>
@@ -91,12 +102,12 @@
 
             <!-- before logging in-->
 
-            <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#loginModal">
+            <button type="button" class="btn btn-success mr-2 mb-2" data-toggle="modal" data-target="#loginModal">
                 <!--Here id is targeted-->
                 Login
             </button>
 
-            <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#signupModal">
+            <button type="button" class="btn btn-success mr-2 mb-2" data-toggle="modal" data-target="#signupModal">
                 SignUp
             </button>
             {% endif %}
@@ -105,11 +116,12 @@
 
         </div>
 
-        <div style="display: flex;">
+        <div class="mt-1 ml-3" style="display: flex;">
             <!--Cart count button-->
             <div>
                 <form action="/shop/checkout">
-                    <button id="popcart" type="submit" class="btn btn-primary mx-2" style="display: flex;">Cart
+                    <button id="popcart" type="submit" class="btn btn-primary mr-2 mb-2" 
+                    style="display: flex;font-size: smaller;padding-left: 6px;">Cart
                         <span class="badge bg-danger ml-1 mt-1">
                             <span id="cartValue">0</span>
                         </span>
@@ -117,8 +129,7 @@
                 </form>
             </div>
 
-
-
+            <!--Hamburger icon ,only visible in mobile view-->
             <div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -220,7 +231,7 @@
                             <input type="password" class="form-control" id="loginpass" name="loginpass"
                                 placeholder="Enter your password ">
                         </div>
-
+                        <input type="hidden" name="currentPathlogIn" id="currentPathlogIn" value="{{request.path}}">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>

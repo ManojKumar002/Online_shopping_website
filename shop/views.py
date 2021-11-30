@@ -56,23 +56,30 @@ def keymatch(item,key):
 def index(request):
     params=loadAllProducts()
     params=load_cart(request,params)
+    #getting the data about user's device type
+    user_agent=request.META['HTTP_USER_AGENT']
+    if('Mobile' in user_agent):
+        params['Mobile']=True
+    else:
+        params['Mobile']=False
     return render(request, "shop/index.html", params)
 
 
 def tracker(request):
     params={}
-    orders_list=[]
-    checkout=Checkout.objects.all()
-    for order in checkout:
-        track=Tracker.objects.filter(order_id=order.order_id).order_by('date')
-        orders_list.append([order,track])
-    params['orders_list']=orders_list
+    if request.user.is_authenticated:
+        orders_list=[]
+        checkout=Checkout.objects.filter(user=request.user)
+        for order in checkout:
+            track=Tracker.objects.filter(user=request.user,order_id=order.order_id).order_by('date')
+            orders_list.append([order,track])
+        params['orders_list']=orders_list
     params=load_cart(request,params)
     return render(request, "shop/tracker.html",params)
 
 
 def checkout(request):
-    params = {'success': False}
+    params={}
     if(request.method == "POST"):
         name = request.POST.get('name') #instead can use request.POST['name'] 
         email = request.POST.get('email')
@@ -82,13 +89,24 @@ def checkout(request):
         zip_code = request.POST.get('zip_code')
         phoneNumber = request.POST.get('phone')
         productJson = request.POST.get('itemsJson')
-        checkout = Checkout(name=name, email=email, address=address, city=city, state=state,
-                            zip_code=zip_code, phoneNumber=phoneNumber, productJson=productJson)
-        checkout.save()
-        orderTracker = Tracker(order_id=checkout.order_id,
-                               desc="Order has been placed")
-        orderTracker.save()
-        params = {'success': True}
+        if(len(productJson)>3):
+            #saving the details of shipping
+            checkout = Checkout(user=request.user,name=name, email=email, address=address, city=city, state=state,zip_code=zip_code, 
+                                                                                    phoneNumber=phoneNumber, productJson=productJson)
+            checkout.save()
+            
+            # initiating the processof order tracking
+            orderTracker = Tracker(order_id=checkout.order_id,user=request.user,desc="Order has been placed")
+            orderTracker.save()
+
+            #erasing the cart data after sucessfully placing the order 
+            cart_record=Cartrecord.objects.get(cart_user=request.user)
+            cart_record.json_data="0"
+            cart_record.save()
+
+            messages.success(request, 'Order has been placed successfully.Please track your orders in the tracker section')
+        else:
+            messages.error(request, 'Your cart is Empty!')
     params=load_cart(request,params)
     return render(request, "shop/checkout.html", params)
 
@@ -214,14 +232,15 @@ def userLogin(request):
     if (request.method=="POST"):
         username=request.POST['loginusername']
         userpass=request.POST['loginpass']
+        currentPathlogIn=request.POST['currentPathlogIn']
         user=authenticate(request,username=username,password=userpass)
         if user is None:
             messages.error(request, 'Invalid credentials, Please try again')
-            return redirect('shopHome')
+            return redirect('currentPathlogIn')
         else:
             login(request,user)
             messages.success(request, 'Successfully Logged in')
-            return redirect("shopHome")
+            return redirect(currentPathlogIn)
     return HttpResponse('404 - Not found')
 
 

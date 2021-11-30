@@ -34,9 +34,10 @@ class Contact(models.Model):
 #stores shipping details of the order
 class Checkout(models.Model):
     order_id=models.AutoField(primary_key=True)
+    user=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     name = models.CharField(max_length=30, default="")
     email = models.CharField(max_length=20, default="")
-    address = models.CharField(max_length=20, default="")
+    address = models.CharField(max_length=200, default="")
     city = models.CharField(max_length=20, default="")
     state = models.CharField(max_length=20, default="")
     zip_code = models.CharField(max_length=20, default="")
@@ -49,6 +50,7 @@ class Checkout(models.Model):
 
 class Tracker(models.Model):
     tracker_id=models.AutoField(primary_key=True)
+    user=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     order_id=models.IntegerField(default="")
     desc = models.CharField(max_length=300, default="Order has been placed")
     date = models.DateTimeField(default=now)
