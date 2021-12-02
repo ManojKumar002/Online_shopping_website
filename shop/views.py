@@ -186,9 +186,21 @@ def search(request):
             messages.error(request,'No match found, Please try different keyword')
             params=loadAllProducts()
             params=load_cart(request,params)
+            #getting the data about user's device type
+            user_agent=request.META['HTTP_USER_AGENT']
+            if('Mobile' in user_agent):
+                params['Mobile']=True
+            else:
+                params['Mobile']=False
             return render(request, "shop/index.html", params)
         params = {'allProds': allProds}
     params=load_cart(request,params)
+    #getting the data about user's device type
+    user_agent=request.META['HTTP_USER_AGENT']
+    if('Mobile' in user_agent):
+        params['Mobile']=True
+    else:
+        params['Mobile']=False
     return render(request, "shop/index.html", params)
 
 
