@@ -34,11 +34,19 @@
 </head>
 
 <body>
+
     <div id="fb-root"></div>
     <!-- script for facebook plugin-->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v12.0"
         nonce="xuiu1WLy"></script>
 
+
+    <!--checking the login status-->
+    {% if user.is_authenticated %}
+    <input type="hidden" value=1 id="login_status">
+    {% else %}
+    <input type="hidden" value=0 id="login_status">
+    {% endif %}
 
 
     <!-- nav bar starts here-->
@@ -47,8 +55,7 @@
         <div style="display: flex;">
             <a href="/shop/" style="display: flex;">
                 <img src="https://img.icons8.com/nolan/64/fast-cart.png" />
-                <span class="navbar-brand mt-2" 
-                style="margin-right:0px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, serif;
+                <span class="navbar-brand mt-2" style="margin-right:0px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif, serif;
                 font-size: x-large;"><strong>Quick Cart</strong>
                 </span>
             </a>
@@ -122,8 +129,8 @@
             <!--Cart count button-->
             <div>
                 <form action="/shop/checkout">
-                    <button id="popcart" type="submit" class="btn btn-primary mr-2 mb-2" 
-                    style="display: flex;font-size: smaller;padding-left: 6px;">Cart
+                    <button id="popcart" type="submit" class="btn btn-primary mr-2 mb-2"
+                        style="display: flex;font-size: smaller;padding-left: 6px;">Cart
                         <span class="badge bg-danger ml-1 mt-1">
                             <span id="cartValue">0</span>
                         </span>
@@ -139,19 +146,23 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
-
         </div>
-
     </nav>
 
 
     <!-- Displays Message below the Navbar-->
+
+    <!--Message bar to show the messages using Js-->
+    <div class="alert alert-warning alert-dismissible" style="display: none;" id='message_bar'></div>
+
+    <!--Message bar to show the messages using django-->
     {% if messages %}
     {% for message in messages %}
     <div class="alert alert-{{message.tags}} alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
         <strong>Message : </strong> {{message}}
     </div>
+
     {% endfor %}
     {% endif %}
 
@@ -280,6 +291,28 @@
             document.getElementById('cartValue').innerHTML = productSum();
         }
 
+
+        //checks the login status
+        function check_login_status() {
+            var login_status = document.getElementById('login_status');
+            if (login_status.value == 1) {
+                return true;
+            }
+
+            else {
+                message_bar = document.getElementById('message_bar');
+                message_bar.innerHTML = `<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <strong>Message : </strong>Please Login to add items to cart`;
+                message_bar.style.display = "block";
+                setTimeout(() => {
+                    message_bar.style.display = "none";
+                    message_bar.innerHTML = "";
+                }, 3000);
+                return false;
+            }
+        }
+
+
         //function for add button
         function addProd() {
             let addProduct = document.querySelectorAll('.cartAdd');
@@ -324,16 +357,19 @@
             var cartClass = document.querySelectorAll(".cart");
             cartClass.forEach((ele) => {
                 ele.addEventListener('click', (e) => {
-                    let cartId = (e.target.getAttribute('id'));
-                    cartArr[cartId] = {};
-                    cartArr[cartId][0] = 1;
-                    cartArr[cartId][1] = document.getElementById("productName" + cartId.slice(7)).innerText;
-                    cartArr[cartId][2] = (document.getElementById("productPrice" + cartId.slice(7)).innerText).slice(2);
-                    refresh();
-                    updateButton();
-                    addProd();
-                    subProd();
-                    update_cart_ajax();
+                    if (check_login_status()) {
+                        let cartId = (e.target.getAttribute('id'));
+                        cartArr[cartId] = {};
+                        cartArr[cartId][0] = 1;
+                        cartArr[cartId][1] = document.getElementById("productName" + cartId.slice(7)).innerText;
+                        cartArr[cartId][2] = (document.getElementById("productPrice" + cartId.slice(7)).innerText).slice(2);
+                        refresh();
+                        updateButton();
+                        addProd();
+                        subProd();
+                        update_cart_ajax();
+                    }
+
                 });
             });
         }

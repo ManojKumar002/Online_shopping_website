@@ -248,7 +248,7 @@ def userLogin(request):
         user=authenticate(request,username=username,password=userpass)
         if user is None:
             messages.error(request, 'Invalid credentials, Please try again')
-            return redirect('currentPathlogIn')
+            return redirect(currentPathlogIn)
         else:
             login(request,user)
             messages.success(request, 'Successfully Logged in')
