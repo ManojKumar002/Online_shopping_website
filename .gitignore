@@ -136,9 +136,9 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 
-**/migrations
+
 *.DS_Store
-**/__pycache__
+**/__pycache__/
 **/.DS_Store
 
 my_env/
