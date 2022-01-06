@@ -37,7 +37,7 @@
 
 	<div class="col my-5">
 		<h2>Step 2 - Enter Address & Other Details:</h2>
-		<form method="post" action="/shop/checkout/">{% csrf_token %}
+		<form method="post" action="/checkout/">{% csrf_token %}
 			{% if user.is_authenticated %}
 			<fieldset>
 			{% else %}

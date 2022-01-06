@@ -148,7 +148,6 @@
         let json_data = JSON.parse(element.innerHTML);
         next_element = element.nextElementSibling;
         temp = next_element.innerHTML;
-        console.log(json_data);
         for (const key in json_data) {
             dict_value = json_data[key];
             temp += `
